@@ -426,3 +426,80 @@ La suppression d’un suivi doit empêcher les nouvelles alertes associées à c
 Le sort des notifications déjà créées ou en cours d’envoi doit être défini afin d’éviter qu’une notification ne soit envoyée après la suppression du suivi.
 
 ---
+
+## 9. Notifications et absence de doublons
+
+### RG-035 — Pertinence d’une notification
+
+**Statut : VALIDÉE**
+
+Une notification ne peut être générée que lorsqu’un événement de prix satisfait les préférences applicables au suivi de l’utilisateur.
+
+Un événement qui ne satisfait pas les conditions configurées ne doit pas produire d’alerte.
+
+### RG-036 — Mutualisation des événements
+
+**Statut : VALIDÉE**
+
+Un événement de prix détecté pour un produit et un marché est partagé entre les utilisateurs concernés.
+
+Chaque utilisateur reçoit une notification uniquement si ses propres paramètres rendent cet événement pertinent.
+
+L’application ne doit pas collecter séparément le même prix pour chaque utilisateur qui suit le produit.
+
+### RG-037 — Déduplication des alertes
+
+**Statut : VALIDÉE**
+
+Pour un même utilisateur, un même suivi, un même événement et un même canal, l’application ne doit pas générer plusieurs notifications équivalentes.
+
+La règle de déduplication doit tenir compte de l’identité de l’événement, et non uniquement du montant du prix.
+
+### RG-038 — Absence de rappels répétitifs
+
+**Statut : VALIDÉE**
+
+Tant qu’une même situation de prix reste active, PriceWise Games ne doit pas renvoyer automatiquement des rappels identiques à intervalles réguliers.
+
+Un nouvel événement peut néanmoins justifier une nouvelle notification si les règles métier l’autorisent.
+
+### RG-039 — État d’une notification
+
+**Statut : VALIDÉE**
+
+Une notification doit permettre de distinguer au minimum :
+- sa création ;
+- son état d’envoi ;
+- son succès ou son échec de livraison ;
+- les éventuelles tentatives de nouvel envoi.
+
+Une notification créée ne doit pas être considérée comme délivrée simplement parce qu’elle existe en base de données.
+
+### RG-040 — Échec temporaire de livraison
+
+**Statut : À PRÉCISER**
+
+Un échec temporaire de livraison doit pouvoir déclencher une nouvelle tentative selon une politique définie.
+
+Un échec permanent ne doit pas entraîner des tentatives illimitées.
+
+Le nombre maximal de tentatives, les délais entre celles-ci et la classification des erreurs seront précisés dans la conception technique.
+
+### RG-041 — Absence de doublon lors d’une nouvelle tentative
+
+**Statut : VALIDÉE**
+
+Une nouvelle tentative d’envoi ne doit pas créer une nouvelle notification métier ni provoquer plusieurs livraisons réussies de la même alerte lorsque l’état de la première tentative est connu.
+
+Le système devra gérer les situations où le résultat d’un envoi est incertain.
+
+### RG-042 — Canal de notification initial
+
+**Statut : VALIDÉE**
+
+Le canal initial de notification est l’e-mail.
+
+L’ajout de notifications dans l’application, de notifications push ou d’autres canaux pourra être étudié ultérieurement sans remettre en cause les règles de pertinence des événements.
+
+---
+
