@@ -285,3 +285,52 @@ Un changement de devise, de marché ou d’identité de produit ne doit pas gén
 
 ---
 
+## 7. Promotions
+
+### RG-022 — Identification d’une promotion
+
+**Statut : À VALIDER TECHNIQUEMENT**
+
+Une promotion doit être associée à un produit et à un marché précis.
+
+Lorsqu’elles sont disponibles de manière fiable, les informations suivantes peuvent être conservées :
+- prix de référence ;
+- prix promotionnel ;
+- pourcentage de réduction ;
+- identifiant de promotion fourni par la source ;
+- dates de début et de fin annoncées par la source ;
+- première et dernière détection par PriceWise Games.
+
+Les dates annoncées par la source et les dates observées par PriceWise Games doivent rester distinctes.
+
+### RG-023 — Dates de promotion inconnues
+
+**Statut : VALIDÉE**
+
+Si la source ne fournit pas de dates de début ou de fin fiables, PriceWise Games ne doit pas inventer ces dates.
+
+L’application peut conserver les dates de première et de dernière détection, sans les présenter comme les dates officielles de la promotion.
+
+### RG-024 — Nouvelle période promotionnelle
+
+**Statut : VALIDÉE**
+
+Une nouvelle période promotionnelle peut constituer un nouvel événement, même si le produit retrouve un prix promotionnel identique à celui d’une période précédente.
+
+L’identité d’une promotion ne doit donc pas dépendre uniquement de son montant.
+
+Les critères exacts permettant de déterminer qu’une période est nouvelle restent à préciser, notamment lorsque la source ne fournit aucun identifiant de promotion.
+
+### RG-025 — Baisse supplémentaire pendant une promotion
+
+**Statut : À DÉCIDER**
+
+Si le prix baisse davantage pendant une promotion déjà active, il reste à définir si cette variation constitue :
+- une mise à jour de la promotion existante ;
+- un nouvel événement de prix ;
+- ou les deux, selon les besoins de l’historique et des notifications.
+
+Cette décision devra éviter de multiplier les alertes pour une même situation sans valeur ajoutée pour l’utilisateur.
+
+---
+
