@@ -162,3 +162,73 @@ L’application devra distinguer au minimum :
 Les règles exactes de gestion de ces états restent à définir.
 
 ---
+
+## 5. Marchés, prix et historique
+
+### RG-011 — Contexte d’un prix
+
+**Statut : VALIDÉE**
+
+Un prix doit toujours être associé à un produit, une boutique, un marché et une devise.
+
+Deux prix issus de marchés ou de devises différents ne doivent pas être comparés comme s’ils étaient directement équivalents.
+
+### RG-012 — Marché initial
+
+**Statut : VALIDÉE**
+
+La première version prend en charge le marché français de Steam, avec des prix exprimés en euros.
+
+Le modèle métier doit néanmoins permettre d’étendre ultérieurement la prise en charge à d’autres marchés.
+
+### RG-013 — Enregistrement des observations
+
+**Statut : VALIDÉE**
+
+Chaque observation valide doit conserver au minimum :
+- le produit concerné ;
+- le marché et la devise ;
+- le montant observé ;
+- la date et l’heure de l’observation ;
+- le contexte nécessaire pour interpréter le prix, lorsque celui-ci est disponible de manière fiable.
+
+Les montants doivent être représentés sans perte de précision monétaire. L’utilisation d’unités monétaires mineures, comme les centimes pour l’euro, est retenue pour éviter les erreurs de calcul liées aux nombres décimaux.
+
+### RG-014 — Historique des prix
+
+**Statut : VALIDÉE**
+
+Les observations historiques constituent un historique des prix réellement relevés par PriceWise Games.
+
+Une observation passée ne doit pas être modifiée pour faire correspondre son prix à la valeur actuelle.
+
+Une erreur détectée peut nécessiter une correction contrôlée, mais cette correction ne doit pas effacer silencieusement la traçabilité de l’anomalie.
+
+### RG-015 — Absence d’historique antérieur fictif
+
+**Statut : VALIDÉE**
+
+PriceWise Games ne doit pas présenter comme observés des prix antérieurs au début de sa propre collecte s’ils ne sont pas disponibles auprès d’une source historique fiable et autorisée.
+
+La date de début de l’historique doit être interprétable par l’utilisateur.
+
+### RG-016 — Fraîcheur des données
+
+**Statut : VALIDÉE**
+
+Un prix affiché doit être accompagné d’une indication permettant de connaître la date de sa dernière observation valide.
+
+Une erreur de collecte ne doit pas remplacer le dernier prix valide par une valeur nulle, arbitraire ou supposée.
+
+Un prix ancien peut rester affiché, mais l’application ne doit pas le présenter comme venant d’être vérifié.
+
+### RG-017 — Absence de prix valide
+
+**Statut : À PRÉCISER**
+
+Lorsqu’aucun prix valide n’est disponible, l’application doit indiquer que le prix est inconnu ou indisponible.
+
+Elle ne doit pas assimiler cette situation à un prix gratuit ou à une baisse de prix.
+
+---
+
