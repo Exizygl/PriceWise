@@ -232,3 +232,56 @@ Elle ne doit pas assimiler cette situation à un prix gratuit ou à une baisse d
 
 ---
 
+## 6. Références de prix et événements
+
+### RG-018 — Calcul d’une réduction
+
+**Statut : VALIDÉE**
+
+Un pourcentage de réduction ne peut être calculé que si le prix de référence et le prix comparé sont valides, comparables et exprimés dans la même devise.
+
+La formule retenue est :
+
+\[
+\text{Réduction (\%)} =
+\frac{\text{Prix de référence} - \text{Prix actuel}}
+{\text{Prix de référence}} \times 100
+\]
+
+Le prix de référence doit être strictement supérieur à zéro.
+
+L’arrondi utilisé pour l’affichage devra être défini dans les spécifications fonctionnelles. Les calculs de décision devront conserver une précision suffisante.
+
+### RG-019 — Référence utilisée pour qualifier une baisse
+
+**Statut : À DÉCIDER**
+
+Le prix de référence utilisé pour distinguer une promotion d’une baisse permanente doit provenir d’une source fiable et d’une règle explicite.
+
+Le dernier prix observé ne doit pas être automatiquement considéré comme le prix de référence d’une promotion.
+
+Il reste à définir les sources autorisées pour la référence, notamment en l’absence de prix de référence fourni de manière fiable par Steam.
+
+### RG-020 — Classification des événements de prix
+
+**Statut : À PRÉCISER**
+
+PriceWise Games doit distinguer les événements métier suivants :
+- début ou détection d’une promotion ;
+- baisse permanente du prix ;
+- hausse du prix ;
+- fin de promotion ;
+- changement de prix dont la nature ne peut pas être déterminée avec suffisamment de certitude.
+
+Une variation observée ne doit pas être qualifiée de baisse permanente uniquement parce que le prix a diminué entre deux collectes.
+
+### RG-021 — Comparabilité des observations
+
+**Statut : VALIDÉE**
+
+Une variation de prix ne doit être interprétée comme un changement de prix que si les observations concernent le même produit et le même contexte de marché.
+
+Un changement de devise, de marché ou d’identité de produit ne doit pas générer artificiellement un événement de baisse ou de hausse.
+
+---
+
