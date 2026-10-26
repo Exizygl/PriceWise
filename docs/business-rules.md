@@ -334,3 +334,95 @@ Cette décision devra éviter de multiplier les alertes pour une même situation
 
 ---
 
+## 8. Suivis et préférences de notification
+
+### RG-026 — Suivi individuel d’un produit
+
+**Statut : VALIDÉE**
+
+Un utilisateur peut ajouter un produit à sa liste de suivis.
+
+Chaque suivi possède ses propres paramètres et ne doit pas modifier les préférences d’un autre utilisateur.
+
+L’ajout de plusieurs produits en une seule action est autorisé, mais chaque produit doit disposer d’un suivi indépendant.
+
+### RG-027 — Unicité d’un suivi
+
+**Statut : À PRÉCISER**
+
+Un utilisateur ne doit pas créer accidentellement plusieurs suivis actifs équivalents pour le même produit et le même marché.
+
+Le comportement attendu lorsqu’un utilisateur ajoute à nouveau un produit déjà suivi doit être défini : par exemple, conserver le suivi existant et permettre sa modification plutôt que créer un doublon.
+
+### RG-028 — Préférences par produit
+
+**Statut : VALIDÉE**
+
+Chaque suivi doit pouvoir comporter les paramètres suivants :
+- activation ou désactivation des alertes de promotion ;
+- activation ou désactivation des alertes de baisse permanente ;
+- prix cible ;
+- réduction minimale souhaitée.
+
+Ces paramètres sont propres au suivi concerné.
+
+### RG-029 — Prix cible
+
+**Statut : VALIDÉE**
+
+Un prix cible représente le montant maximal auquel l’utilisateur souhaite être alerté pour le produit suivi.
+
+Une condition de prix cible est satisfaite lorsque le prix valide retenu pour la comparaison est inférieur ou égal au prix cible.
+
+Le prix comparé doit correspondre au produit et au marché suivis.
+
+### RG-030 — Réduction minimale
+
+**Statut : À PRÉCISER**
+
+Une réduction minimale définit le seuil de réduction à partir duquel une notification liée à une réduction peut être envoyée.
+
+Ce seuil ne peut être évalué que lorsque le prix de référence est fiable et que le calcul de réduction est possible.
+
+Le comportement exact lorsque le prix de référence est inconnu reste à définir.
+
+### RG-031 — Combinaison des critères d’alerte
+
+**Statut : À DÉCIDER**
+
+Les préférences de prix cible et de réduction minimale doivent pouvoir coexister.
+
+Il reste à définir précisément la combinaison de ces critères pour chaque type d’événement, notamment :
+- si l’atteinte du prix cible suffit à déclencher une alerte, indépendamment du seuil de réduction ;
+- si le seuil de réduction s’applique aux promotions, aux baisses permanentes ou aux deux ;
+- si une notification peut être envoyée lorsqu’un critère est satisfait mais que l’autre ne l’est pas.
+
+Cette règle devra être formalisée avant le développement du moteur de notifications.
+
+### RG-032 — Ajout d’un produit déjà sous le prix cible
+
+**Statut : VALIDÉE**
+
+Lorsqu’un utilisateur ajoute un produit et que son dernier prix valide connu satisfait déjà son prix cible, une alerte initiale doit être déclenchée.
+
+Cette alerte ne doit pas dépendre de la survenue d’une nouvelle baisse après l’ajout.
+
+### RG-033 — Activation d’une préférence déjà satisfaite
+
+**Statut : À PRÉCISER**
+
+Lorsqu’un utilisateur active une préférence alors que la condition correspondante est déjà satisfaite, le comportement retenu est de permettre une alerte initiale.
+
+Les conditions exactes de cette alerte devront être définies pour éviter qu’une simple modification de paramètres ne déclenche plusieurs messages identiques.
+
+### RG-034 — Modification et suppression d’un suivi
+
+**Statut : À PRÉCISER**
+
+La modification des préférences d’un suivi ne doit affecter que ce suivi.
+
+La suppression d’un suivi doit empêcher les nouvelles alertes associées à ce suivi.
+
+Le sort des notifications déjà créées ou en cours d’envoi doit être défini afin d’éviter qu’une notification ne soit envoyée après la suppression du suivi.
+
+---
