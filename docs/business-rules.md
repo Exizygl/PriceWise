@@ -636,3 +636,33 @@ La conservation des données personnelles doit faire l’objet d’une politique
 
 ---
 
+## 12. Contraintes métier transverses
+
+### RG-056 — Cohérence des données
+
+**Statut : VALIDÉE**
+
+Les données utilisées pour une décision métier doivent être cohérentes entre elles.
+
+Une notification ne doit pas être générée à partir d’un prix invalide, d’une devise incompatible ou d’un produit incorrectement identifié.
+
+### RG-057 — Traçabilité des décisions
+
+**Statut : VALIDÉE**
+
+Les traitements qui modifient l’état métier — observation d’un prix, détection d’un événement, création d’une notification et résultat de livraison — doivent laisser suffisamment de traces pour permettre de comprendre ce qui s’est produit.
+
+La traçabilité ne justifie pas la conservation de données personnelles non nécessaires.
+
+### RG-058 — Limite budgétaire
+
+**Statut : VALIDÉE**
+
+L’architecture initiale doit viser un coût d’exploitation maximal de **5 € par mois**.
+
+Ce plafond est une contrainte de conception et non une garantie de coût tant que les fournisseurs, les quotas et les besoins réels ne sont pas validés.
+
+Une décision technique entraînant un dépassement prévisible doit être identifiée avant sa mise en œuvre.
+
+---
+
