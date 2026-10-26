@@ -666,3 +666,22 @@ Une décision technique entraînant un dépassement prévisible doit être ident
 
 ---
 
+## 13. Décisions à prendre avant les spécifications fonctionnelles définitives
+
+Les points suivants doivent être arbitrés ou vérifiés avant de figer le comportement de l’application.
+
+| Priorité | Sujet | Question à résoudre |
+|---|---|---|
+| **P0** | Source Steam | Quelle source permet de récupérer les prix, les marchés, les promotions et les éventuelles dates, dans des conditions acceptables ? |
+| **P0** | Prix de référence | Quel prix sert de référence pour calculer une réduction et distinguer une baisse permanente d’une promotion ? |
+| **P0** | Combinaison des alertes | Le prix cible est-il indépendant du seuil de réduction ? À quels événements le seuil s’applique-t-il ? |
+| **P0** | Collecte | L’hébergement retenu permet-il une collecte quotidienne fiable et persistante dans le budget ? |
+| **P1** | Promotions | Comment déterminer la fin d’une promotion et l’apparition d’une nouvelle période lorsque la source fournit peu d’informations ? |
+| **P1** | Baisse pendant une promotion | Une réduction supplémentaire produit-elle une nouvelle alerte ? |
+| **P1** | Préférences activées | Quelle alerte initiale est envoyée lorsqu’une préférence est activée alors que son critère est déjà satisfait ? |
+| **P1** | Doublons de suivis | Quel comportement adopter si l’utilisateur ajoute un produit qu’il suit déjà ? |
+| **P1** | Échecs d’e-mail | Combien de tentatives, quels délais et quels critères d’abandon retenir ? |
+| **P1** | Suppression du compte | Quelles données supprimer, anonymiser ou conserver, et pendant combien de temps ? |
+
+**P0** désigne un sujet bloquant pour le cadrage du cœur métier. **P1** désigne un sujet à résoudre avant de finaliser les règles concernées ou de livrer la fonctionnalité correspondante.
+
