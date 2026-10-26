@@ -61,3 +61,60 @@ L’ajout d’autres boutiques, d’autres marchés et d’autres devises est en
 | **Événement de prix (`PriceEvent`)** | Changement de prix ou événement commercial détecté par PriceWise Games. |
 | **Notification (`Notification`)** | Alerte destinée à un utilisateur à la suite d’un événement de prix pertinent. |
 | **Collecte (`CollectionRun`)** | Exécution d’un processus chargé de récupérer et d’enregistrer les prix. |
+
+---
+
+## 3. Comptes et accès
+
+### RG-001 — Création d’un compte
+
+**Statut : VALIDÉE**
+
+L’accès aux fonctionnalités personnalisées nécessite un compte utilisateur.
+
+Un visiteur non connecté peut consulter les fonctionnalités publiques qui ne nécessitent pas d’identification, mais ne peut pas gérer ses propres suivis ni recevoir d’alertes personnalisées.
+
+### RG-002 — Méthodes d’authentification
+
+**Statut : VALIDÉE**
+
+L’application doit proposer les méthodes suivantes :
+- adresse e-mail et mot de passe ;
+- connexion avec Google ;
+- connexion avec Steam.
+
+Chaque méthode doit permettre d’identifier un compte de manière fiable.
+
+### RG-003 — Vérification de l’adresse e-mail
+
+**Statut : VALIDÉE**
+
+Une adresse e-mail doit être vérifiée avant de pouvoir être utilisée pour recevoir des notifications.
+
+Un utilisateur connecté avec Steam ou Google ne doit pas être considéré comme disposant d’une adresse vérifiée sans preuve suffisante de cette vérification.
+
+### RG-004 — Réinitialisation du mot de passe
+
+**Statut : VALIDÉE**
+
+Un utilisateur disposant d’un mot de passe doit pouvoir demander sa réinitialisation sans que l’application révèle si une adresse e-mail est associée à un compte.
+
+La procédure doit reposer sur un mécanisme de vérification temporaire et sécurisé.
+
+### RG-005 — Isolation des données utilisateurs
+
+**Statut : VALIDÉE**
+
+Un utilisateur ne peut consulter ou modifier que ses propres suivis, préférences, notifications et informations personnelles, sauf données explicitement publiques.
+
+Toute opération nécessitant une autorisation doit être contrôlée côté serveur.
+
+### RG-006 — Association de plusieurs méthodes de connexion
+
+**Statut : À PRÉCISER**
+
+Un même utilisateur pourra potentiellement utiliser plusieurs méthodes de connexion.
+
+L’association de comptes existants devra être explicitement sécurisée. La simple égalité de deux adresses e-mail ne devra pas suffire, à elle seule, à associer des comptes lorsque cela ne permet pas de prouver le contrôle des identités concernées.
+
+---
