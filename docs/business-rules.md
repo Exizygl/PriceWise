@@ -588,3 +588,51 @@ Une variation inhabituelle ne doit pas automatiquement être traitée comme une 
 
 ---
 
+## 11. Sécurité et protection des données
+
+### RG-051 — Protection des identifiants
+
+**Statut : VALIDÉE**
+
+Les mots de passe ne doivent jamais être stockés en clair.
+
+Les secrets d’authentification et les clés des fournisseurs externes ne doivent pas être exposés au navigateur ni publiés dans le dépôt Git.
+
+### RG-052 — Contrôle des autorisations
+
+**Statut : VALIDÉE**
+
+Les droits d’accès doivent être vérifiés côté serveur pour chaque opération protégée.
+
+Masquer une action dans l’interface ne constitue pas un contrôle d’autorisation suffisant.
+
+### RG-053 — Minimisation des données
+
+**Statut : VALIDÉE**
+
+PriceWise Games ne doit collecter que les données personnelles nécessaires au fonctionnement des comptes, des suivis, de la sécurité et des notifications.
+
+Les données d’authentification reçues d’un fournisseur externe doivent être limitées à celles qui sont nécessaires.
+
+### RG-054 — Suppression d’un compte
+
+**Statut : À DÉCIDER**
+
+L’utilisateur devra disposer d’un moyen de demander la suppression de son compte.
+
+Les règles de suppression ou d’anonymisation des suivis, notifications et autres données associées restent à définir.
+
+Les obligations légales applicables et les éventuelles durées de conservation justifiées devront être prises en compte.
+
+### RG-055 — Conservation des données
+
+**Statut : À DÉCIDER**
+
+L’historique des prix est destiné à être conservé sans limite prédéfinie dans le périmètre initial.
+
+Cette orientation doit être conciliée avec les contraintes de stockage, les obligations de protection des données et les conditions applicables aux données issues de sources externes.
+
+La conservation des données personnelles doit faire l’objet d’une politique distincte et justifiée.
+
+---
+
