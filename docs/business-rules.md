@@ -1,13 +1,3 @@
-
-# PriceWise Games — Référentiel des règles de gestion
-
-**Fichier cible :** `docs/business-rules.md`  
-**Version :** 0.1 — Document de travail  
-**Statut :** En cours de validation  
-**Périmètre :** Première version publique de PriceWise Games, consacrée aux jeux PC vendus sur Steam en France, avec des prix exprimés en euros.
-
----
-
 ## 1. Objet du document
 
 Ce document définit les règles métier que PriceWise Games doit respecter, indépendamment des choix techniques utilisés pour les implémenter.
@@ -685,3 +675,17 @@ Les points suivants doivent être arbitrés ou vérifiés avant de figer le comp
 
 **P0** désigne un sujet bloquant pour le cadrage du cœur métier. **P1** désigne un sujet à résoudre avant de finaliser les règles concernées ou de livrer la fonctionnalité correspondante.
 
+---
+
+## 14. Critères de validation du référentiel
+
+Ce référentiel sera considéré comme suffisamment stabilisé lorsque :
+
+1. Chaque règle nécessaire au MVP aura un comportement non ambigu.
+2. Les règles validées seront distinguées des hypothèses techniques.
+3. Les critères de déclenchement et de déduplication des alertes seront définis sans contradiction.
+4. Les règles de collecte seront compatibles avec les données réellement disponibles.
+5. Les règles de conservation, de sécurité et de suppression des données seront suffisamment définies.
+6. Les règles retenues pourront être traduites en critères d’acceptation et en tests.
+
+Les évolutions ultérieures devront modifier ce référentiel de façon explicite plutôt que de laisser les règles métier se disperser dans le code ou dans le README.
