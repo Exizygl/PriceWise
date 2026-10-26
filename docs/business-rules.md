@@ -1,3 +1,5 @@
+# Business-rules
+
 ## 1. Objet du document
 
 Ce document définit les règles métier que PriceWise Games doit respecter, indépendamment des choix techniques utilisés pour les implémenter.
