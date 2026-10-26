@@ -503,3 +503,88 @@ L’ajout de notifications dans l’application, de notifications push ou d’au
 
 ---
 
+## 10. Collecte des prix et fiabilité
+
+### RG-043 — Collecte mutualisée
+
+**Statut : VALIDÉE**
+
+La collecte des prix doit être mutualisée par produit, boutique et marché.
+
+Le nombre d’utilisateurs suivant un produit ne doit pas multiplier le nombre de collectes nécessaires pour obtenir son prix.
+
+### RG-044 — Fréquence cible
+
+**Statut : À VALIDER TECHNIQUEMENT**
+
+La fréquence cible initiale est d’une collecte quotidienne.
+
+Cette fréquence devra être confirmée après validation de la source de données, des limites d’accès et des capacités de l’hébergement.
+
+Elle constitue une fréquence de collecte planifiée, et non une garantie que chaque prix sera actualisé exactement toutes les vingt-quatre heures.
+
+### RG-045 — Prévention des collectes concurrentes
+
+**Statut : VALIDÉE**
+
+Plusieurs exécutions simultanées ne doivent pas produire de collectes concurrentes non maîtrisées pour un même périmètre.
+
+La conception technique devra prévoir un mécanisme empêchant les traitements planifiés ou relancés de provoquer des doublons et des conflits.
+
+### RG-046 — Enregistrement du résultat d’une collecte
+
+**Statut : VALIDÉE**
+
+Une collecte doit permettre de connaître son résultat et de distinguer :
+- une collecte réussie ;
+- une collecte partiellement réussie ;
+- une collecte échouée ;
+- un produit ignoré ou indisponible.
+
+Les informations nécessaires au diagnostic des échecs doivent être conservées sans enregistrer inutilement de données sensibles.
+
+### RG-047 — Échec de collecte
+
+**Statut : VALIDÉE**
+
+Un échec de collecte ne doit pas être interprété comme une variation de prix.
+
+Aucune nouvelle observation de prix valide ne doit être créée à partir d’une donnée absente, invalide ou non vérifiée.
+
+Le dernier prix valide reste consultable, avec une indication appropriée de son ancienneté.
+
+### RG-048 — Source des données Steam
+
+**Statut : À VALIDER TECHNIQUEMENT**
+
+La source utilisée pour récupérer les prix et les informations commerciales doit être examinée avant le développement de la collecte.
+
+L’examen doit porter notamment sur :
+- la disponibilité des données nécessaires ;
+- la stabilité de la source ;
+- les conditions d’utilisation applicables ;
+- les limites de requêtes ;
+- les marchés et devises pris en charge ;
+- la disponibilité des dates et identifiants de promotion ;
+- les conditions de conservation et de réutilisation des données.
+
+Aucune donnée nécessaire au fonctionnement du produit ne doit être supposée disponible tant que sa disponibilité n’a pas été vérifiée.
+
+### RG-049 — Respect des limites de la source
+
+**Statut : VALIDÉE**
+
+La collecte doit respecter les limites et conditions applicables à la source.
+
+En cas de limitation, d’indisponibilité ou de changement de format, l’application doit privilégier un échec contrôlé plutôt que d’enregistrer des données incorrectes.
+
+### RG-050 — Détection des changements de source
+
+**Statut : À PRÉCISER**
+
+La conception devra prévoir des contrôles permettant de détecter les données manquantes, incohérentes ou inattendues après un changement de la source.
+
+Une variation inhabituelle ne doit pas automatiquement être traitée comme une baisse réelle sans validation suffisante.
+
+---
+
