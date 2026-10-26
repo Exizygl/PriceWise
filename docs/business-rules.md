@@ -118,3 +118,47 @@ Un même utilisateur pourra potentiellement utiliser plusieurs méthodes de conn
 L’association de comptes existants devra être explicitement sécurisée. La simple égalité de deux adresses e-mail ne devra pas suffire, à elle seule, à associer des comptes lorsque cela ne permet pas de prouver le contrôle des identités concernées.
 
 ---
+
+## 4. Catalogue et identité des produits
+
+### RG-007 — Identification d’un produit commercialisable
+
+**Statut : VALIDÉE**
+
+Chaque produit suivi doit correspondre à un élément commercialisable identifiable sur la boutique source.
+
+L’identité du produit doit être suffisamment précise pour éviter de mélanger les prix de deux éditions ou contenus différents.
+
+### RG-008 — Distinction entre jeu et produit
+
+**Statut : VALIDÉE**
+
+Un jeu et les produits commerciaux qui lui sont associés sont deux notions distinctes.
+
+Un jeu peut posséder plusieurs produits : jeu de base, éditions différentes, DLC ou bundles.
+
+Le prix d’un produit ne doit jamais être automatiquement attribué à tous les autres produits du même jeu.
+
+### RG-009 — Relations entre produits
+
+**Statut : VALIDÉE**
+
+Une relation entre un jeu, une édition, un DLC ou un bundle ne doit être enregistrée que si elle repose sur une information suffisamment fiable.
+
+En cas de doute, l’application doit conserver des produits distincts plutôt que d’inventer une relation.
+
+### RG-010 — Disponibilité d’un produit
+
+**Statut : À PRÉCISER**
+
+Un produit indisponible, retiré de la vente ou dont les données ne peuvent plus être récupérées ne doit pas être traité comme un produit dont le prix est nul.
+
+L’application devra distinguer au minimum :
+- un prix valide ;
+- une indisponibilité confirmée ;
+- une donnée absente ou inexploitable ;
+- une erreur de collecte.
+
+Les règles exactes de gestion de ces états restent à définir.
+
+---
