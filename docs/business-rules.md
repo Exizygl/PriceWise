@@ -1,693 +1,368 @@
-# Business-rules
+# Règles métier
 
-## 1. Objet du document
+## 1. Objectif du document
 
-Ce document définit les règles métier que PriceWise Games doit respecter, indépendamment des choix techniques utilisés pour les implémenter.
+Ce document définit les règles métier de PriceWise Games : gestion des comptes, suivi des jeux, collecte et historique des prix, déclenchement des alertes et conservation des données.
 
-Il sert de référence pour :
-- concevoir les fonctionnalités ;
-- définir le modèle de données ;
-- développer les traitements de collecte et de notification ;
-- écrire les tests métier ;
-- vérifier la cohérence du comportement de l’application.
+Il sert de référence pour les spécifications fonctionnelles, le développement et les tests.
 
-### 1.1. Statuts des règles
+Les contraintes techniques ou réglementaires qui restent à vérifier sont identifiées dans la section 10.
 
-Chaque règle possède un statut permettant de distinguer une décision acquise d'un point à résoudre.
+## 2. Comptes et utilisateurs
 
-- **VALIDÉE** : décision métier déjà retenue.
-- **À PRÉCISER** : principe retenu, mais comportement détaillé à définir.
-- **À VALIDER TECHNIQUEMENT** : dépend d’une contrainte externe, notamment de la source de données Steam ou de l’hébergement.
-- **À DÉCIDER** : arbitrage métier encore nécessaire.
+### RG-001 — Création d'un compte
 
-Une règle validée métier peut néanmoins nécessiter une validation technique avant sa mise en production.
+L'accès aux fonctionnalités personnalisées nécessite un compte utilisateur.
 
-### 1.2. Périmètre fonctionnel
+### RG-002 — Authentification
 
-La première version couvre :
-- la gestion des comptes utilisateurs ;
-- la consultation du catalogue Steam ;
-- le suivi individuel des produits ;
-- l’historique des prix observés ;
-- la détection des promotions et des baisses de prix ;
-- les alertes personnalisées par e-mail ;
-- la collecte mutualisée des prix.
+Les méthodes d'authentification prévues sont :
+- Adresse e-mail et mot de passe.
+- Compte Google.
+- Compte Steam.
 
-L’ajout d’autres boutiques, d’autres marchés et d’autres devises est envisagé ultérieurement, mais ne fait pas partie du périmètre initial.
+### RG-003 — Vérification de l'adresse e-mail
 
----
+La création de compte par e-mail nécessite une vérification de l'adresse e-mail.
 
-## 2. Définitions métier
+La réinitialisation du mot de passe doit être possible pour les comptes utilisant cette méthode d'authentification.
 
-| Terme | Définition |
-|---|---|
-| **Jeu (`Game`)** | Œuvre vidéoludique, indépendamment des éditions et contenus permettant de l’acheter. |
-| **Produit (`Product`)** | Élément commercialisable : jeu de base, édition spécifique, DLC ou bundle. |
-| **Boutique (`Store`)** | Plateforme de vente sur laquelle un produit est proposé. Steam est la première boutique prise en charge. |
-| **Marché (`Market`)** | Zone commerciale déterminant notamment la disponibilité, le prix et la devise. Le marché français est le marché initial. |
-| **Observation de prix (`PriceObservation`)** | Prix effectivement relevé à un instant donné pour un produit sur un marché. |
-| **Prix de référence (`ReferencePrice`)** | Prix retenu comme base de comparaison pour calculer une réduction. |
-| **Promotion (`Promotion`)** | Période durant laquelle un produit bénéficie d’un prix promotionnel identifié. |
-| **Suivi (`Tracking`)** | Association entre un utilisateur et un produit, avec ses propres paramètres d’alerte. |
-| **Préférences de notification** | Paramètres qui déterminent les événements de prix susceptibles de déclencher une alerte pour un suivi. |
-| **Événement de prix (`PriceEvent`)** | Changement de prix ou événement commercial détecté par PriceWise Games. |
-| **Notification (`Notification`)** | Alerte destinée à un utilisateur à la suite d’un événement de prix pertinent. |
-| **Collecte (`CollectionRun`)** | Exécution d’un processus chargé de récupérer et d’enregistrer les prix. |
+La connexion via Steam ne garantit pas à elle seule qu'une adresse e-mail vérifiée est disponible pour l'envoi d'alertes.
 
----
+### RG-004 — Isolation des utilisateurs
 
-## 3. Comptes et accès
+Chaque utilisateur ne peut consulter et modifier que ses propres suivis, préférences et données personnelles.
 
-### RG-001 — Création d’un compte
+Un utilisateur ne doit jamais pouvoir modifier les données d'un autre utilisateur sans autorisation explicite.
 
-**Statut : VALIDÉE**
+## 3. Catalogue des jeux et produits
 
-L’accès aux fonctionnalités personnalisées nécessite un compte utilisateur.
+### RG-005 — Catalogue partagé
 
-Un visiteur non connecté peut consulter les fonctionnalités publiques qui ne nécessitent pas d’identification, mais ne peut pas gérer ses propres suivis ni recevoir d’alertes personnalisées.
+Le catalogue des produits est commun à tous les utilisateurs.
 
-### RG-002 — Méthodes d’authentification
+Un produit n'est pas dupliqué simplement parce que plusieurs utilisateurs souhaitent le suivre.
 
-**Statut : VALIDÉE**
+### RG-006 — Distinction entre jeux et produits
 
-L’application doit proposer les méthodes suivantes :
-- adresse e-mail et mot de passe ;
-- connexion avec Google ;
-- connexion avec Steam.
+Le modèle métier distingue un jeu de ses produits commerciaux.
 
-Chaque méthode doit permettre d’identifier un compte de manière fiable.
+Un produit peut notamment représenter :
+- Un jeu de base.
+- Une édition spécifique.
+- Un DLC.
+- Un bundle.
 
-### RG-003 — Vérification de l’adresse e-mail
+### RG-007 — Relations entre produits
 
-**Statut : VALIDÉE**
+Les relations entre un jeu, ses éditions, ses DLC et ses bundles ne sont enregistrées que lorsque la relation est suffisamment fiable.
 
-Une adresse e-mail doit être vérifiée avant de pouvoir être utilisée pour recevoir des notifications.
+Un bundle ou un DLC ne doit pas être assimilé automatiquement au jeu de base.
 
-Un utilisateur connecté avec Steam ou Google ne doit pas être considéré comme disposant d’une adresse vérifiée sans preuve suffisante de cette vérification.
+### RG-008 — Recherche et identification
 
-### RG-004 — Réinitialisation du mot de passe
+Chaque produit doit pouvoir être identifié de manière suffisamment précise pour éviter de mélanger les prix de produits différents.
 
-**Statut : VALIDÉE**
+Les identifiants fournis par Steam sont utilisés lorsqu'ils sont disponibles et adaptés au besoin.
 
-Un utilisateur disposant d’un mot de passe doit pouvoir demander sa réinitialisation sans que l’application révèle si une adresse e-mail est associée à un compte.
+## 4. Collecte et historique des prix
 
-La procédure doit reposer sur un mécanisme de vérification temporaire et sécurisé.
+### RG-009 — Marché initial
 
-### RG-005 — Isolation des données utilisateurs
+Le premier périmètre couvre le marché français de Steam, avec l'euro comme devise de référence.
 
-**Statut : VALIDÉE**
+L'ajout d'autres marchés ou devises relève d'une évolution ultérieure.
 
-Un utilisateur ne peut consulter ou modifier que ses propres suivis, préférences, notifications et informations personnelles, sauf données explicitement publiques.
+### RG-010 — Collecte quotidienne
 
-Toute opération nécessitant une autorisation doit être contrôlée côté serveur.
+La fréquence cible est d'une collecte par jour pour chaque produit et marché pris en charge.
 
-### RG-006 — Association de plusieurs méthodes de connexion
+Cette fréquence reste soumise à la faisabilité technique, aux conditions d'utilisation de la source et aux capacités de l'hébergement.
 
-**Statut : À PRÉCISER**
+### RG-011 — Collecte mutualisée
 
-Un même utilisateur pourra potentiellement utiliser plusieurs méthodes de connexion.
+Les prix sont collectés au niveau du produit et du marché, puis partagés entre les utilisateurs.
 
-L’association de comptes existants devra être explicitement sécurisée. La simple égalité de deux adresses e-mail ne devra pas suffire, à elle seule, à associer des comptes lorsque cela ne permet pas de prouver le contrôle des identités concernées.
+La collecte ne doit pas être répétée séparément pour chaque utilisateur qui suit le même produit.
 
----
+### RG-012 — Enregistrement d'un prix
 
-## 4. Catalogue et identité des produits
+Chaque relevé valide doit conserver au minimum :
+- Le produit concerné.
+- Le marché.
+- La devise.
+- Le montant observé.
+- La date et l'heure de l'observation.
 
-### RG-007 — Identification d’un produit commercialisable
+Les montants sont stockés dans une représentation monétaire précise, par exemple en centimes d'euro, et non en nombres à virgule flottante.
 
-**Statut : VALIDÉE**
+### RG-013 — Historique des prix
 
-Chaque produit suivi doit correspondre à un élément commercialisable identifiable sur la boutique source.
+Les relevés valides alimentent l'historique partagé du produit.
 
-L’identité du produit doit être suffisamment précise pour éviter de mélanger les prix de deux éditions ou contenus différents.
+L'historique ne doit pas contenir de prix historiques inventés ou reconstruits sans source fiable.
 
-### RG-008 — Distinction entre jeu et produit
+Les données ne peuvent être présentées comme observées par PriceWise qu'à partir du moment où les observations réelles ont commencé.
 
-**Statut : VALIDÉE**
+### RG-014 — Échec de collecte
 
-Un jeu et les produits commerciaux qui lui sont associés sont deux notions distinctes.
+Une collecte échouée ne crée aucun relevé fictif.
 
-Un jeu peut posséder plusieurs produits : jeu de base, éditions différentes, DLC ou bundles.
+Le dernier prix valide reste disponible, accompagné de sa date d'observation.
 
-Le prix d’un produit ne doit jamais être automatiquement attribué à tous les autres produits du même jeu.
+### RG-015 — Comparaison après un échec
 
-### RG-009 — Relations entre produits
+Après une ou plusieurs collectes échouées, le prochain prix valide est comparé au dernier prix valide enregistré.
 
-**Statut : VALIDÉE**
+Une baisse peut donc être détectée même si plusieurs jours se sont écoulés entre deux observations réussies.
 
-Une relation entre un jeu, une édition, un DLC ou un bundle ne doit être enregistrée que si elle repose sur une information suffisamment fiable.
+PriceWise ne prétend pas connaître l'instant exact auquel la baisse s'est produite si aucune observation ne permet de l'établir.
 
-En cas de doute, l’application doit conserver des produits distincts plutôt que d’inventer une relation.
+### RG-016 — Absence de données valides
 
-### RG-010 — Disponibilité d’un produit
+Lorsqu'aucun prix valide n'est disponible, PriceWise ne doit pas inventer de prix ni déclencher une alerte de baisse sur une comparaison impossible.
 
-**Statut : À PRÉCISER**
+La première observation valide sert de référence initiale, sous réserve des règles propres au suivi concerné.
 
-Un produit indisponible, retiré de la vente ou dont les données ne peuvent plus être récupérées ne doit pas être traité comme un produit dont le prix est nul.
+## 5. Baisses de prix et promotions
 
-L’application devra distinguer au minimum :
-- un prix valide ;
-- une indisponibilité confirmée ;
-- une donnée absente ou inexploitable ;
-- une erreur de collecte.
+### RG-017 — Enregistrement des baisses
 
-Les règles exactes de gestion de ces états restent à définir.
+Toute diminution de prix constatée entre deux observations valides est enregistrée comme une baisse de prix.
 
----
+### RG-018 — Classification des promotions
 
-## 5. Marchés, prix et historique
+Une baisse est classée comme promotion uniquement si les données disponibles permettent de l'établir de manière fiable.
 
-### RG-011 — Contexte d’un prix
+Une diminution constatée ne suffit pas, à elle seule, à prouver qu'une promotion est en cours.
 
-**Statut : VALIDÉE**
+### RG-019 — Baisse non classifiée
 
-Un prix doit toujours être associé à un produit, une boutique, un marché et une devise.
+Si la nature d'une baisse ne peut pas être déterminée de manière fiable, elle reste non classifiée.
 
-Deux prix issus de marchés ou de devises différents ne doivent pas être comparés comme s’ils étaient directement équivalents.
+Le système ne doit pas présenter cette baisse comme une promotion sur la base d'une supposition.
 
-### RG-012 — Marché initial
+### RG-020 — Préférences par type de baisse
 
-**Statut : VALIDÉE**
+Les utilisateurs pourront configurer leurs préférences de notification selon les types de baisse pris en charge.
 
-La première version prend en charge le marché français de Steam, avec des prix exprimés en euros.
+Le comportement exact lorsque le type d'une baisse est inconnu reste à préciser. Une baisse non classifiée ne doit pas être automatiquement assimilée à une promotion ou à une baisse non promotionnelle.
 
-Le modèle métier doit néanmoins permettre d’étendre ultérieurement la prise en charge à d’autres marchés.
+## 6. Suivi des produits et prix cibles
 
-### RG-013 — Enregistrement des observations
+### RG-021 — Suivi indépendant
 
-**Statut : VALIDÉE**
+Chaque utilisateur gère sa propre liste de produits suivis.
 
-Chaque observation valide doit conserver au minimum :
-- le produit concerné ;
-- le marché et la devise ;
-- le montant observé ;
-- la date et l’heure de l’observation ;
-- le contexte nécessaire pour interpréter le prix, lorsque celui-ci est disponible de manière fiable.
+Les préférences de suivi d'un utilisateur n'affectent pas celles des autres utilisateurs.
 
-Les montants doivent être représentés sans perte de précision monétaire. L’utilisation d’unités monétaires mineures, comme les centimes pour l’euro, est retenue pour éviter les erreurs de calcul liées aux nombres décimaux.
+### RG-022 — Préférences par produit
 
-### RG-014 — Historique des prix
+Chaque produit suivi possède ses propres paramètres d'alerte.
 
-**Statut : VALIDÉE**
+Les paramètres d'un produit ne s'appliquent pas automatiquement aux autres produits suivis.
 
-Les observations historiques constituent un historique des prix réellement relevés par PriceWise Games.
+### RG-023 — Modes d'alerte
 
-Une observation passée ne doit pas être modifiée pour faire correspondre son prix à la valeur actuelle.
+Deux modes sont prévus :
+- **Prix cible :** l'utilisateur définit un prix maximal auquel il souhaite être alerté.
+- **Toute réduction :** l'utilisateur souhaite être alerté des baisses admissibles sans définir de prix cible.
 
-Une erreur détectée peut nécessiter une correction contrôlée, mais cette correction ne doit pas effacer silencieusement la traçabilité de l’anomalie.
+Lorsqu'un prix cible est défini, le mode « Toute réduction » ne s'applique pas simultanément.
 
-### RG-015 — Absence d’historique antérieur fictif
+### RG-024 — Déclenchement avec un prix cible
 
-**Statut : VALIDÉE**
+Lorsqu'un prix cible est défini, une baisse ne déclenche une alerte que si le prix observé atteint ou passe sous ce seuil, conformément aux règles de suivi.
 
-PriceWise Games ne doit pas présenter comme observés des prix antérieurs au début de sa propre collecte s’ils ne sont pas disponibles auprès d’une source historique fiable et autorisée.
+Le prix doit être comparé à la référence pertinente pour ce suivi.
 
-La date de début de l’historique doit être interprétable par l’utilisateur.
+### RG-025 — Première activation d'un suivi
 
-### RG-016 — Fraîcheur des données
+L'ajout d'un produit ne déclenche pas d'alerte immédiate simplement parce que le dernier prix connu est déjà inférieur ou égal au prix cible.
 
-**Statut : VALIDÉE**
+Le système attend une nouvelle baisse admissible observée après l'activation du suivi.
 
-Un prix affiché doit être accompagné d’une indication permettant de connaître la date de sa dernière observation valide.
+### RG-026 — Prix de référence initial
 
-Une erreur de collecte ne doit pas remplacer le dernier prix valide par une valeur nulle, arbitraire ou supposée.
+Lorsqu'un suivi est créé, le dernier prix valide disponible sert de référence initiale si un tel prix existe.
 
-Un prix ancien peut rester affiché, mais l’application ne doit pas le présenter comme venant d’être vérifié.
+Si aucun prix valide n'existe, la première observation réussie établit la référence initiale.
 
-### RG-017 — Absence de prix valide
+Cette référence permet de distinguer une variation ultérieure d'une situation déjà présente au moment de l'activation.
 
-**Statut : À PRÉCISER**
+### RG-027 — Modification du prix cible
 
-Lorsqu’aucun prix valide n’est disponible, l’application doit indiquer que le prix est inconnu ou indisponible.
+Une modification du prix cible ne déclenche pas d'alerte à elle seule, même si le prix actuel respecte le nouveau seuil.
 
-Elle ne doit pas assimiler cette situation à un prix gratuit ou à une baisse de prix.
+Le nouveau seuil est appliqué aux observations ultérieures.
 
----
+Le système utilise le prix observé au moment de la modification comme nouvelle référence de comparaison. Les événements antérieurs ne sont pas rejoués pour générer une alerte.
 
-## 6. Références de prix et événements
+### RG-028 — Désactivation des alertes
 
-### RG-018 — Calcul d’une réduction
+Lorsqu'un utilisateur désactive les alertes d'un suivi, aucune nouvelle alerte n'est déclenchée pour ce suivi pendant la période de désactivation.
 
-**Statut : VALIDÉE**
+Les préférences du suivi sont conservées.
 
-Un pourcentage de réduction ne peut être calculé que si le prix de référence et le prix comparé sont valides, comparables et exprimés dans la même devise.
+### RG-029 — Réactivation des alertes
 
-La formule retenue est :
+À la réactivation, le prix courant connu devient la nouvelle référence de comparaison.
 
-\[
-\text{Réduction (\%)} =
-\frac{\text{Prix de référence} - \text{Prix actuel}}
-{\text{Prix de référence}} \times 100
-\]
+Les baisses survenues pendant la désactivation ne sont pas rattrapées.
 
-Le prix de référence doit être strictement supérieur à zéro.
+Une nouvelle baisse admissible observée après la réactivation peut déclencher une alerte.
 
-L’arrondi utilisé pour l’affichage devra être défini dans les spécifications fonctionnelles. Les calculs de décision devront conserver une précision suffisante.
+### RG-030 — Prix inchangé
 
-### RG-019 — Référence utilisée pour qualifier une baisse
+Un prix identique au prix de référence ne constitue pas une nouvelle baisse et ne déclenche pas d'alerte de baisse.
 
-**Statut : À DÉCIDER**
+### RG-031 — Nouvelle baisse après remontée
 
-Le prix de référence utilisé pour distinguer une promotion d’une baisse permanente doit provenir d’une source fiable et d’une règle explicite.
+Lorsqu'un prix est remonté au-dessus du prix cible, une nouvelle baisse admissible vers ou sous ce seuil peut déclencher une nouvelle alerte.
 
-Le dernier prix observé ne doit pas être automatiquement considéré comme le prix de référence d’une promotion.
+Exemple avec un prix cible de 25 € :
+- Le prix passe de 30 € à 24 € : une alerte peut être déclenchée.
+- Le prix remonte à 28 € : aucune alerte de baisse n'est déclenchée.
+- Le prix redescend à 24 € : une nouvelle alerte peut être déclenchée.
 
-Il reste à définir les sources autorisées pour la référence, notamment en l’absence de prix de référence fourni de manière fiable par Steam.
+### RG-032 — Fréquence des observations et variations manquées
 
-### RG-020 — Classification des événements de prix
+La collecte quotidienne peut ne pas observer toutes les variations intermédiaires.
 
-**Statut : À PRÉCISER**
+Les alertes reposent sur les données effectivement observées. Le système ne doit pas prétendre avoir détecté des variations qui n'apparaissent pas dans les relevés disponibles.
 
-PriceWise Games doit distinguer les événements métier suivants :
-- début ou détection d’une promotion ;
-- baisse permanente du prix ;
-- hausse du prix ;
-- fin de promotion ;
-- changement de prix dont la nature ne peut pas être déterminée avec suffisamment de certitude.
+### RG-033 — Seuils et pourcentages
 
-Une variation observée ne doit pas être qualifiée de baisse permanente uniquement parce que le prix a diminué entre deux collectes.
+Le prix cible est exprimé dans la devise du marché concerné.
 
-### RG-021 — Comparabilité des observations
+Un pourcentage de réduction peut être affiché à titre informatif s'il peut être calculé à partir de données fiables. Il ne constitue pas une condition de déclenchement, sauf ajout ultérieur d'une règle explicite.
 
-**Statut : VALIDÉE**
+## 7. Notifications par e-mail
 
-Une variation de prix ne doit être interprétée comme un changement de prix que si les observations concernent le même produit et le même contexte de marché.
+### RG-034 — Conditions d'envoi
 
-Un changement de devise, de marché ou d’identité de produit ne doit pas générer artificiellement un événement de baisse ou de hausse.
+Une notification par e-mail est créée lorsqu'un événement répond aux règles d'alerte du suivi et que les préférences de l'utilisateur autorisent cette notification.
 
----
+### RG-035 — Adresse de destination
 
-## 7. Promotions
+L'envoi utilise une adresse e-mail disponible et autorisée pour les notifications.
 
-### RG-022 — Identification d’une promotion
+La connexion via Steam seule ne garantit pas la disponibilité d'une adresse e-mail vérifiée.
 
-**Statut : À VALIDER TECHNIQUEMENT**
+### RG-036 — Mise en attente des alertes
 
-Une promotion doit être associée à un produit et à un marché précis.
+Une alerte créée est conservée dans le système jusqu'à son envoi réussi ou jusqu'à l'atteinte de la limite de tentatives définie.
 
-Lorsqu’elles sont disponibles de manière fiable, les informations suivantes peuvent être conservées :
-- prix de référence ;
-- prix promotionnel ;
-- pourcentage de réduction ;
-- identifiant de promotion fourni par la source ;
-- dates de début et de fin annoncées par la source ;
-- première et dernière détection par PriceWise Games.
+### RG-037 — Réessais d'envoi
 
-Les dates annoncées par la source et les dates observées par PriceWise Games doivent rester distinctes.
+En cas d'échec temporaire, l'envoi est réessayé automatiquement.
 
-### RG-023 — Dates de promotion inconnues
+Le nombre maximal de tentatives et le délai entre celles-ci restent à définir lors de la conception technique.
 
-**Statut : VALIDÉE**
+### RG-038 — Prévention des doublons
 
-Si la source ne fournit pas de dates de début ou de fin fiables, PriceWise Games ne doit pas inventer ces dates.
+Une même alerte ne doit pas générer plusieurs e-mails simplement parce que l'envoi a été réessayé.
 
-L’application peut conserver les dates de première et de dernière détection, sans les présenter comme les dates officielles de la promotion.
+Le système doit conserver un identifiant ou un mécanisme équivalent permettant de reconnaître l'alerte et de suivre son état d'envoi.
 
-### RG-024 — Nouvelle période promotionnelle
+### RG-039 — Échec définitif
 
-**Statut : VALIDÉE**
+Lorsque la limite de tentatives est atteinte sans envoi réussi, l'alerte est marquée comme ayant échoué.
 
-Une nouvelle période promotionnelle peut constituer un nouvel événement, même si le produit retrouve un prix promotionnel identique à celui d’une période précédente.
+Cet état doit rester identifiable pour le suivi technique et le diagnostic.
 
-L’identité d’une promotion ne doit donc pas dépendre uniquement de son montant.
+### RG-040 — Traçabilité des envois
 
-Les critères exacts permettant de déterminer qu’une période est nouvelle restent à préciser, notamment lorsque la source ne fournit aucun identifiant de promotion.
+Le système conserve les informations nécessaires au suivi des notifications : événement associé, statut d'envoi et résultats des tentatives.
 
-### RG-025 — Baisse supplémentaire pendant une promotion
+Les données techniques conservées doivent être limitées à ce qui est nécessaire au fonctionnement et au diagnostic du service.
 
-**Statut : À DÉCIDER**
+## 8. Suppression de compte et conservation des données
 
-Si le prix baisse davantage pendant une promotion déjà active, il reste à définir si cette variation constitue :
-- une mise à jour de la promotion existante ;
-- un nouvel événement de prix ;
-- ou les deux, selon les besoins de l’historique et des notifications.
+### RG-041 — Suppression du compte
 
-Cette décision devra éviter de multiplier les alertes pour une même situation sans valeur ajoutée pour l’utilisateur.
+L'utilisateur doit pouvoir demander la suppression de son compte.
 
----
+La procédure de suppression doit empêcher toute utilisation ultérieure du compte supprimé.
 
-## 8. Suivis et préférences de notification
+### RG-042 — Suppression des données personnelles et des suivis
 
-### RG-026 — Suivi individuel d’un produit
+La suppression du compte entraîne la suppression des suivis personnels, des préférences d'alerte et des données personnelles associées qui peuvent légalement être supprimées.
 
-**Statut : VALIDÉE**
+Les éventuelles obligations légales de conservation doivent être respectées.
 
-Un utilisateur peut ajouter un produit à sa liste de suivis.
+### RG-043 — Conservation des données partagées
 
-Chaque suivi possède ses propres paramètres et ne doit pas modifier les préférences d’un autre utilisateur.
+Le catalogue commun et l'historique partagé des prix sont conservés lors de la suppression d'un compte, car ils ne dépendent pas d'un seul utilisateur.
 
-L’ajout de plusieurs produits en une seule action est autorisé, mais chaque produit doit disposer d’un suivi indépendant.
+La suppression d'un utilisateur ne doit pas altérer les suivis ou les données des autres utilisateurs.
 
-### RG-027 — Unicité d’un suivi
+### RG-044 — Arrêt des notifications
 
-**Statut : À PRÉCISER**
+Après la suppression du compte, aucune nouvelle alerte ne doit être envoyée à cet utilisateur.
 
-Un utilisateur ne doit pas créer accidentellement plusieurs suivis actifs équivalents pour le même produit et le même marché.
+Les notifications en attente doivent être annulées ou rendues définitivement non envoyables pour ce compte.
 
-Le comportement attendu lorsqu’un utilisateur ajoute à nouveau un produit déjà suivi doit être défini : par exemple, conserver le suivi existant et permettre sa modification plutôt que créer un doublon.
+### RG-045 — Journaux et sauvegardes
 
-### RG-028 — Préférences par produit
+Les journaux techniques, sauvegardes et éventuelles données résiduelles doivent faire l'objet d'une politique de conservation adaptée aux obligations légales et aux besoins de sécurité.
 
-**Statut : VALIDÉE**
+Les délais et modalités précis restent à définir.
 
-Chaque suivi doit pouvoir comporter les paramètres suivants :
-- activation ou désactivation des alertes de promotion ;
-- activation ou désactivation des alertes de baisse permanente ;
-- prix cible ;
-- réduction minimale souhaitée.
+## 9. Sécurité, fiabilité et coûts
 
-Ces paramètres sont propres au suivi concerné.
+### RG-046 — Protection des mots de passe
 
-### RG-029 — Prix cible
+Les mots de passe ne doivent jamais être stockés en clair. Ils doivent être protégés au moyen d'un mécanisme de hachage adapté.
 
-**Statut : VALIDÉE**
+### RG-047 — Protection des secrets
 
-Un prix cible représente le montant maximal auquel l’utilisateur souhaite être alerté pour le produit suivi.
+Les clés d'API, secrets d'authentification et identifiants de services doivent rester côté serveur et ne pas être exposés au frontend.
 
-Une condition de prix cible est satisfaite lorsque le prix valide retenu pour la comparaison est inférieur ou égal au prix cible.
+### RG-048 — Fiabilité des données
 
-Le prix comparé doit correspondre au produit et au marché suivis.
+Le système ne doit pas créer de relevés, de promotions ou d'événements de baisse qui ne sont pas étayés par des données fiables.
 
-### RG-030 — Réduction minimale
+### RG-049 — Objectif budgétaire
 
-**Statut : À PRÉCISER**
+L'objectif initial est de maintenir les coûts d'exploitation à 5 € par mois ou moins.
 
-Une réduction minimale définit le seuil de réduction à partir duquel une notification liée à une réduction peut être envoyée.
+Cet objectif constitue une contrainte de conception et non une garantie de coût. Il doit être vérifié en tenant compte de l'hébergement, de la base de données, de la collecte et du service d'e-mail.
 
-Ce seuil ne peut être évalué que lorsque le prix de référence est fiable et que le calcul de réduction est possible.
+## 10. Points restant à vérifier ou à préciser
 
-Le comportement exact lorsque le prix de référence est inconnu reste à définir.
+Les sujets suivants ne sont pas considérés comme définitivement tranchés.
 
-### RG-031 — Combinaison des critères d’alerte
+### P-001 — Conditions de collecte Steam
 
-**Statut : À DÉCIDER**
+Vérifier les sources de prix accessibles, les conditions d'utilisation applicables, les limites de requêtes et la faisabilité d'une collecte quotidienne automatisée.
 
-Les préférences de prix cible et de réduction minimale doivent pouvoir coexister.
+### P-002 — Classification et préférences de notification
 
-Il reste à définir précisément la combinaison de ces critères pour chaque type d’événement, notamment :
-- si l’atteinte du prix cible suffit à déclencher une alerte, indépendamment du seuil de réduction ;
-- si le seuil de réduction s’applique aux promotions, aux baisses permanentes ou aux deux ;
-- si une notification peut être envoyée lorsqu’un critère est satisfait mais que l’autre ne l’est pas.
+Définir précisément le comportement lorsque le type d'une baisse est inconnu et que l'utilisateur a choisi de recevoir uniquement certains types de notifications.
 
-Cette règle devra être formalisée avant le développement du moteur de notifications.
+### P-003 — Politique de réessai des e-mails
 
-### RG-032 — Ajout d’un produit déjà sous le prix cible
+Fixer le nombre maximal de tentatives, les délais entre tentatives et les conditions d'arrêt des réessais.
 
-**Statut : VALIDÉE**
+### P-004 — Conservation des données résiduelles
 
-Lorsqu’un utilisateur ajoute un produit et que son dernier prix valide connu satisfait déjà son prix cible, une alerte initiale doit être déclenchée.
+Définir les délais applicables aux journaux, sauvegardes et éventuelles données devant être conservées pour des raisons légales ou de sécurité.
 
-Cette alerte ne doit pas dépendre de la survenue d’une nouvelle baisse après l’ajout.
+### P-005 — Fournisseur d'e-mails
 
-### RG-033 — Activation d’une préférence déjà satisfaite
+Choisir le fournisseur de messagerie transactionnelle et vérifier ses tarifs, ses quotas et ses conditions.
 
-**Statut : À PRÉCISER**
+### P-006 — Faisabilité du budget
 
-Lorsqu’un utilisateur active une préférence alors que la condition correspondante est déjà satisfaite, le comportement retenu est de permettre une alerte initiale.
+Vérifier que l'ensemble des services nécessaires peut fonctionner dans l'objectif budgétaire de 5 € par mois.
 
-Les conditions exactes de cette alerte devront être définies pour éviter qu’une simple modification de paramètres ne déclenche plusieurs messages identiques.
+### P-007 — Données historiques et limites de stockage
 
-### RG-034 — Modification et suppression d’un suivi
+Définir les mesures techniques nécessaires pour conserver l'historique des prix de manière fiable, tout en maîtrisant les coûts et les obligations de conservation applicables.
 
-**Statut : À PRÉCISER**
+## 11. Principe général
 
-La modification des préférences d’un suivi ne doit affecter que ce suivi.
+En cas de doute sur la nature d'une donnée, PriceWise privilégie la transparence : il conserve les observations fiables, distingue les faits des classifications incertaines et n'envoie des alertes que lorsque les conditions métier sont satisfaites.
 
-La suppression d’un suivi doit empêcher les nouvelles alertes associées à ce suivi.
-
-Le sort des notifications déjà créées ou en cours d’envoi doit être défini afin d’éviter qu’une notification ne soit envoyée après la suppression du suivi.
-
----
-
-## 9. Notifications et absence de doublons
-
-### RG-035 — Pertinence d’une notification
-
-**Statut : VALIDÉE**
-
-Une notification ne peut être générée que lorsqu’un événement de prix satisfait les préférences applicables au suivi de l’utilisateur.
-
-Un événement qui ne satisfait pas les conditions configurées ne doit pas produire d’alerte.
-
-### RG-036 — Mutualisation des événements
-
-**Statut : VALIDÉE**
-
-Un événement de prix détecté pour un produit et un marché est partagé entre les utilisateurs concernés.
-
-Chaque utilisateur reçoit une notification uniquement si ses propres paramètres rendent cet événement pertinent.
-
-L’application ne doit pas collecter séparément le même prix pour chaque utilisateur qui suit le produit.
-
-### RG-037 — Déduplication des alertes
-
-**Statut : VALIDÉE**
-
-Pour un même utilisateur, un même suivi, un même événement et un même canal, l’application ne doit pas générer plusieurs notifications équivalentes.
-
-La règle de déduplication doit tenir compte de l’identité de l’événement, et non uniquement du montant du prix.
-
-### RG-038 — Absence de rappels répétitifs
-
-**Statut : VALIDÉE**
-
-Tant qu’une même situation de prix reste active, PriceWise Games ne doit pas renvoyer automatiquement des rappels identiques à intervalles réguliers.
-
-Un nouvel événement peut néanmoins justifier une nouvelle notification si les règles métier l’autorisent.
-
-### RG-039 — État d’une notification
-
-**Statut : VALIDÉE**
-
-Une notification doit permettre de distinguer au minimum :
-- sa création ;
-- son état d’envoi ;
-- son succès ou son échec de livraison ;
-- les éventuelles tentatives de nouvel envoi.
-
-Une notification créée ne doit pas être considérée comme délivrée simplement parce qu’elle existe en base de données.
-
-### RG-040 — Échec temporaire de livraison
-
-**Statut : À PRÉCISER**
-
-Un échec temporaire de livraison doit pouvoir déclencher une nouvelle tentative selon une politique définie.
-
-Un échec permanent ne doit pas entraîner des tentatives illimitées.
-
-Le nombre maximal de tentatives, les délais entre celles-ci et la classification des erreurs seront précisés dans la conception technique.
-
-### RG-041 — Absence de doublon lors d’une nouvelle tentative
-
-**Statut : VALIDÉE**
-
-Une nouvelle tentative d’envoi ne doit pas créer une nouvelle notification métier ni provoquer plusieurs livraisons réussies de la même alerte lorsque l’état de la première tentative est connu.
-
-Le système devra gérer les situations où le résultat d’un envoi est incertain.
-
-### RG-042 — Canal de notification initial
-
-**Statut : VALIDÉE**
-
-Le canal initial de notification est l’e-mail.
-
-L’ajout de notifications dans l’application, de notifications push ou d’autres canaux pourra être étudié ultérieurement sans remettre en cause les règles de pertinence des événements.
-
----
-
-## 10. Collecte des prix et fiabilité
-
-### RG-043 — Collecte mutualisée
-
-**Statut : VALIDÉE**
-
-La collecte des prix doit être mutualisée par produit, boutique et marché.
-
-Le nombre d’utilisateurs suivant un produit ne doit pas multiplier le nombre de collectes nécessaires pour obtenir son prix.
-
-### RG-044 — Fréquence cible
-
-**Statut : À VALIDER TECHNIQUEMENT**
-
-La fréquence cible initiale est d’une collecte quotidienne.
-
-Cette fréquence devra être confirmée après validation de la source de données, des limites d’accès et des capacités de l’hébergement.
-
-Elle constitue une fréquence de collecte planifiée, et non une garantie que chaque prix sera actualisé exactement toutes les vingt-quatre heures.
-
-### RG-045 — Prévention des collectes concurrentes
-
-**Statut : VALIDÉE**
-
-Plusieurs exécutions simultanées ne doivent pas produire de collectes concurrentes non maîtrisées pour un même périmètre.
-
-La conception technique devra prévoir un mécanisme empêchant les traitements planifiés ou relancés de provoquer des doublons et des conflits.
-
-### RG-046 — Enregistrement du résultat d’une collecte
-
-**Statut : VALIDÉE**
-
-Une collecte doit permettre de connaître son résultat et de distinguer :
-- une collecte réussie ;
-- une collecte partiellement réussie ;
-- une collecte échouée ;
-- un produit ignoré ou indisponible.
-
-Les informations nécessaires au diagnostic des échecs doivent être conservées sans enregistrer inutilement de données sensibles.
-
-### RG-047 — Échec de collecte
-
-**Statut : VALIDÉE**
-
-Un échec de collecte ne doit pas être interprété comme une variation de prix.
-
-Aucune nouvelle observation de prix valide ne doit être créée à partir d’une donnée absente, invalide ou non vérifiée.
-
-Le dernier prix valide reste consultable, avec une indication appropriée de son ancienneté.
-
-### RG-048 — Source des données Steam
-
-**Statut : À VALIDER TECHNIQUEMENT**
-
-La source utilisée pour récupérer les prix et les informations commerciales doit être examinée avant le développement de la collecte.
-
-L’examen doit porter notamment sur :
-- la disponibilité des données nécessaires ;
-- la stabilité de la source ;
-- les conditions d’utilisation applicables ;
-- les limites de requêtes ;
-- les marchés et devises pris en charge ;
-- la disponibilité des dates et identifiants de promotion ;
-- les conditions de conservation et de réutilisation des données.
-
-Aucune donnée nécessaire au fonctionnement du produit ne doit être supposée disponible tant que sa disponibilité n’a pas été vérifiée.
-
-### RG-049 — Respect des limites de la source
-
-**Statut : VALIDÉE**
-
-La collecte doit respecter les limites et conditions applicables à la source.
-
-En cas de limitation, d’indisponibilité ou de changement de format, l’application doit privilégier un échec contrôlé plutôt que d’enregistrer des données incorrectes.
-
-### RG-050 — Détection des changements de source
-
-**Statut : À PRÉCISER**
-
-La conception devra prévoir des contrôles permettant de détecter les données manquantes, incohérentes ou inattendues après un changement de la source.
-
-Une variation inhabituelle ne doit pas automatiquement être traitée comme une baisse réelle sans validation suffisante.
-
----
-
-## 11. Sécurité et protection des données
-
-### RG-051 — Protection des identifiants
-
-**Statut : VALIDÉE**
-
-Les mots de passe ne doivent jamais être stockés en clair.
-
-Les secrets d’authentification et les clés des fournisseurs externes ne doivent pas être exposés au navigateur ni publiés dans le dépôt Git.
-
-### RG-052 — Contrôle des autorisations
-
-**Statut : VALIDÉE**
-
-Les droits d’accès doivent être vérifiés côté serveur pour chaque opération protégée.
-
-Masquer une action dans l’interface ne constitue pas un contrôle d’autorisation suffisant.
-
-### RG-053 — Minimisation des données
-
-**Statut : VALIDÉE**
-
-PriceWise Games ne doit collecter que les données personnelles nécessaires au fonctionnement des comptes, des suivis, de la sécurité et des notifications.
-
-Les données d’authentification reçues d’un fournisseur externe doivent être limitées à celles qui sont nécessaires.
-
-### RG-054 — Suppression d’un compte
-
-**Statut : À DÉCIDER**
-
-L’utilisateur devra disposer d’un moyen de demander la suppression de son compte.
-
-Les règles de suppression ou d’anonymisation des suivis, notifications et autres données associées restent à définir.
-
-Les obligations légales applicables et les éventuelles durées de conservation justifiées devront être prises en compte.
-
-### RG-055 — Conservation des données
-
-**Statut : À DÉCIDER**
-
-L’historique des prix est destiné à être conservé sans limite prédéfinie dans le périmètre initial.
-
-Cette orientation doit être conciliée avec les contraintes de stockage, les obligations de protection des données et les conditions applicables aux données issues de sources externes.
-
-La conservation des données personnelles doit faire l’objet d’une politique distincte et justifiée.
-
----
-
-## 12. Contraintes métier transverses
-
-### RG-056 — Cohérence des données
-
-**Statut : VALIDÉE**
-
-Les données utilisées pour une décision métier doivent être cohérentes entre elles.
-
-Une notification ne doit pas être générée à partir d’un prix invalide, d’une devise incompatible ou d’un produit incorrectement identifié.
-
-### RG-057 — Traçabilité des décisions
-
-**Statut : VALIDÉE**
-
-Les traitements qui modifient l’état métier — observation d’un prix, détection d’un événement, création d’une notification et résultat de livraison — doivent laisser suffisamment de traces pour permettre de comprendre ce qui s’est produit.
-
-La traçabilité ne justifie pas la conservation de données personnelles non nécessaires.
-
-### RG-058 — Limite budgétaire
-
-**Statut : VALIDÉE**
-
-L’architecture initiale doit viser un coût d’exploitation maximal de **5 € par mois**.
-
-Ce plafond est une contrainte de conception et non une garantie de coût tant que les fournisseurs, les quotas et les besoins réels ne sont pas validés.
-
-Une décision technique entraînant un dépassement prévisible doit être identifiée avant sa mise en œuvre.
-
----
-
-## 13. Décisions à prendre avant les spécifications fonctionnelles définitives
-
-Les points suivants doivent être arbitrés ou vérifiés avant de figer le comportement de l’application.
-
-| Priorité | Sujet | Question à résoudre |
-|---|---|---|
-| **P0** | Source Steam | Quelle source permet de récupérer les prix, les marchés, les promotions et les éventuelles dates, dans des conditions acceptables ? |
-| **P0** | Prix de référence | Quel prix sert de référence pour calculer une réduction et distinguer une baisse permanente d’une promotion ? |
-| **P0** | Combinaison des alertes | Le prix cible est-il indépendant du seuil de réduction ? À quels événements le seuil s’applique-t-il ? |
-| **P0** | Collecte | L’hébergement retenu permet-il une collecte quotidienne fiable et persistante dans le budget ? |
-| **P1** | Promotions | Comment déterminer la fin d’une promotion et l’apparition d’une nouvelle période lorsque la source fournit peu d’informations ? |
-| **P1** | Baisse pendant une promotion | Une réduction supplémentaire produit-elle une nouvelle alerte ? |
-| **P1** | Préférences activées | Quelle alerte initiale est envoyée lorsqu’une préférence est activée alors que son critère est déjà satisfait ? |
-| **P1** | Doublons de suivis | Quel comportement adopter si l’utilisateur ajoute un produit qu’il suit déjà ? |
-| **P1** | Échecs d’e-mail | Combien de tentatives, quels délais et quels critères d’abandon retenir ? |
-| **P1** | Suppression du compte | Quelles données supprimer, anonymiser ou conserver, et pendant combien de temps ? |
-
-**P0** désigne un sujet bloquant pour le cadrage du cœur métier. **P1** désigne un sujet à résoudre avant de finaliser les règles concernées ou de livrer la fonctionnalité correspondante.
-
----
-
-## 14. Critères de validation du référentiel
-
-Ce référentiel sera considéré comme suffisamment stabilisé lorsque :
-
-1. Chaque règle nécessaire au MVP aura un comportement non ambigu.
-2. Les règles validées seront distinguées des hypothèses techniques.
-3. Les critères de déclenchement et de déduplication des alertes seront définis sans contradiction.
-4. Les règles de collecte seront compatibles avec les données réellement disponibles.
-5. Les règles de conservation, de sécurité et de suppression des données seront suffisamment définies.
-6. Les règles retenues pourront être traduites en critères d’acceptation et en tests.
-
-Les évolutions ultérieures devront modifier ce référentiel de façon explicite plutôt que de laisser les règles métier se disperser dans le code ou dans le README.
+Toute modification ultérieure de ces règles doit être répercutée dans les spécifications fonctionnelles et les tests associés.
